@@ -1,6 +1,7 @@
 package zs.qimai.com.printer.utils
 
 import android.app.PendingIntent
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.hardware.usb.UsbDevice
@@ -44,7 +45,8 @@ class PrintManagerUtils {
         mOnBtConnectCallBack: OnBtConnectCallBack? = null
     ) {
 
-
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        bluetoothAdapter?.cancelDiscovery()
         BlueDeviceManager().apply {
             this.address = address
             this.mOnBtConnectCallBack = mOnBtConnectCallBack

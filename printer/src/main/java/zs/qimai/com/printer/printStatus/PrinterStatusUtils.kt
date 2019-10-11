@@ -11,6 +11,7 @@ import zs.qimai.com.printer.utils.PrintFormat
 import zs.qimai.com.printer.manager.DeviceManager
 import zs.qimai.com.printer.manager.DeviceManager.Companion.ESC
 import zs.qimai.com.printer.manager.DeviceManager.Companion.TSC
+import java.lang.Exception
 import kotlin.experimental.and
 
 /***
@@ -32,6 +33,9 @@ class PrinterStatusUtils(val deviceManager: DeviceManager) {
     fun queryStatus() {
         mSearchThread.start()
         job = GlobalScope.launch {
+          try {
+
+
             //发送esc命令查询
             async1 = sendEscCommandSearch()
             //延时2秒
@@ -41,6 +45,9 @@ class PrinterStatusUtils(val deviceManager: DeviceManager) {
             delay(2000)
             //以上如果成功都会取消协程。这里
             handleEnd()
+          }catch (e:Exception){
+              Log.d(TAG, "queryStatus: e= $e")
+          }
         }
     }
 
@@ -144,7 +151,7 @@ class PrinterStatusUtils(val deviceManager: DeviceManager) {
                             handleEnd()
                         }
                     }
-                    mPrintStatusCallBack?.searchResult(mPrintMode)
+                    //mPrintStatusCallBack?.searchResult(mPrintMode)
                 }
 
             }

@@ -94,7 +94,7 @@ class BtListActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             override fun onBlueToothFound(bluetoothDevice: BluetoothDevice?) {
-                Log.d(TAG, "onBlueToothFound: ")
+                //Log.d(TAG, "onBlueToothFound: ")
                 bluetoothDevice?.let {
 
                     var status = setDatas.add(it)

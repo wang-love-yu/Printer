@@ -64,17 +64,17 @@ class RequestBlueToothListReceiverManager : LifecycleObserver {
         override fun onReceive(p0: Context?, intent: Intent?) {
             val action = intent?.action
             if (action == BluetoothDevice.ACTION_FOUND) {
-                Log.d(TAG, "onReceive: BluetoothDevice.ACTION_FOUND")
+                //Log.d(TAG, "onReceive: BluetoothDevice.ACTION_FOUND")
                 val bluetoothDevice =
                     intent?.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 bluetoothDevice?.let {
                     if (!it.name.isNullOrEmpty()) {
                         blueToothSearchCallBack?.onBlueToothFound(bluetoothDevice)
-                        Log.d(
+                        /*Log.d(
                             TAG,
                             "onReceive: bluetoothDevice name= " + bluetoothDevice!!.name + " address= "
                                     + bluetoothDevice!!.address + "  "
-                        )
+                        )*/
                     }
                 }
 

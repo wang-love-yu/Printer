@@ -7,17 +7,29 @@ import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import zs.qimai.com.printer.callback.PrintCallBack
+import zs.qimai.com.printer.callback.PrintConnOrDisCallBack
 import zs.qimai.com.printer.canvas.LabelTemplete
 import zs.qimai.com.printer.canvas.TestPrintTemplate
 import zs.qimai.com.printer.executer.PrintExecutor
 import zs.qimai.com.printer.manager.DeviceManager
+import zs.qimai.com.printer.manager.DeviceManagerUtils
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , PrintConnOrDisCallBack {
+    override fun onConectPrint(device: DeviceManager) {
+
+        Log.d(TAG, "onConectPrint: device= $device")
+    }
+
+    override fun onDisPrint(device: DeviceManager) {
+        Log.d(TAG, "onDisPrint: device= $device")
+    }
 
     private val TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        DeviceManagerUtils.getInstance().addConnectStatusCallBack(this)
         tv_connect_bt.setOnClickListener {
             startActivity(Intent(this, BtListActivity::class.java))
         }
@@ -88,5 +100,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        DeviceManagerUtils.getInstance().removeConnectStatusCallBack(this)
+
     }
 }
