@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothDevice
 import android.hardware.usb.UsbDevice
 import android.util.Log
 import zs.qimai.com.printer.callback.PrintConnOrDisCallBack
+import zs.qimai.com.printer.manager.DeviceManager.Companion.BT
+import zs.qimai.com.printer.manager.DeviceManager.Companion.USB
 import java.util.HashSet
 
 /*****
@@ -152,7 +154,34 @@ class DeviceManagerUtils {
                 it.closePort()
             }
         }
-
     }
 
+    //获得通过蓝牙连接的打印机数量
+    fun getAccrodBtConNums():Int{
+        var nums = 0
+        return if(lists.size==0){
+            nums
+        }else{
+            lists.forEach {
+                if (it.mType==BT){
+                    nums++
+                }
+            }
+            nums
+        }
+    }
+    //获得通过USB连接的打印机数量
+    fun getAccrodUsbConNums():Int{
+        var nums = 0
+        return if(lists.size==0){
+            nums
+        }else{
+            lists.forEach {
+                if (it.mType== USB){
+                    nums++
+                }
+            }
+            nums
+        }
+    }
 }
