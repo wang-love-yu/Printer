@@ -40,7 +40,10 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
         //先判断当前设备是否已经保存过
         if (DeviceManagerUtils.getInstance().isContainerBtDevice(address!!)) {
             Log.d(TAG, "usbConnect: this device is bind")
-            mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.BT_DEVICE_ALREAD_CONN, "该设备已经连接过")
+            mOnBtConnectCallBack?.onConnectError(
+                PrintManagerUtils.BT_DEVICE_ALREAD_CONN,
+                "该设备已经连接过"
+            )
             return
         }
         mBlueAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -202,29 +205,29 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
             }
         }
 
-      /*  Observable.interval(5L, TimeUnit.SECONDS)
-            .map {
-                writeData(PrintFormat.INITBYTE)
-                true
-            }
-            .subscribe(object : Observer<Boolean> {
-                override fun onComplete() {
+        /*  Observable.interval(5L, TimeUnit.SECONDS)
+              .map {
+                  writeData(PrintFormat.INITBYTE)
+                  true
+              }
+              .subscribe(object : Observer<Boolean> {
+                  override fun onComplete() {
 
-                }
+                  }
 
-                override fun onSubscribe(d: Disposable) {
-                    disposable = d
-                }
+                  override fun onSubscribe(d: Disposable) {
+                      disposable = d
+                  }
 
-                override fun onNext(t: Boolean) {
-                    Log.d(TAG, "onNext: t= $t")
-                }
+                  override fun onNext(t: Boolean) {
+                      Log.d(TAG, "onNext: t= $t")
+                  }
 
-                override fun onError(e: Throwable) {
-                    Log.d(TAG, "onError: e= ${e.message}")
-                    disposable = null
-                }
-            })*/
+                  override fun onError(e: Throwable) {
+                      Log.d(TAG, "onError: e= ${e.message}")
+                      disposable = null
+                  }
+              })*/
     }
 
     private fun handleUnknownStatus() {
