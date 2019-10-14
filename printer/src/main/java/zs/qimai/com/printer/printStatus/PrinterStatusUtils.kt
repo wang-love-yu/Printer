@@ -33,21 +33,20 @@ class PrinterStatusUtils(val deviceManager: DeviceManager) {
     fun queryStatus() {
         mSearchThread.start()
         job = GlobalScope.launch {
-          try {
+            try {
 
-
-            //发送esc命令查询
-            async1 = sendEscCommandSearch()
-            //延时2秒
-            delay(2000)
-            //发送tsc命名查询
-            async2 = sendTscCommandSearch()
-            delay(2000)
-            //以上如果成功都会取消协程。这里
-            handleEnd()
-          }catch (e:Exception){
-              Log.d(TAG, "queryStatus: e= $e")
-          }
+                //发送esc命令查询
+                async1 = sendEscCommandSearch()
+                //延时2秒
+                delay(2000)
+                //发送tsc命名查询
+                async2 = sendTscCommandSearch()
+                delay(2000)
+                //以上如果成功都会取消协程。这里
+                handleEnd()
+            } catch (e: Exception) {
+                Log.d(TAG, "queryStatus: e= $e")
+            }
         }
     }
 
@@ -81,7 +80,7 @@ class PrinterStatusUtils(val deviceManager: DeviceManager) {
         Log.d(TAG, "sendTscCommandSearch: ")
         return GlobalScope.async {
             withContext(Dispatchers.IO) {
-                if (mPrintMode != null || mPrintMode == DeviceManager.ESC) {
+                if (mPrintMode != null || mPrintMode == ESC) {
                     return@withContext
                 } else {
                     mSendMode = TSC
@@ -136,7 +135,7 @@ class PrinterStatusUtils(val deviceManager: DeviceManager) {
                         (msg.data.getByteArray(READ_BUFFER_ARRAY) ?: return) ?: return  //数据
                     Log.d(TAG, "handleMessage: mSendMode= $mSendMode")
                     //这里只对查询状态返回值做处理，其它返回值可参考编程手册来解析
-                  // val result = judgeResponseType(buffer[0]) //数据右移
+                    // val result = judgeResponseType(buffer[0]) //数据右移
                     if (mSendMode == ESC) {
                         //设置当前打印机模式为ESC模式
                         if (mPrintMode == null) {

@@ -1,6 +1,5 @@
 package zs.qimai.com.printer.paint
 
-import com.tools.command.EscCommand
 import zs.qimai.com.printer.enmu.FontAligin
 import zs.qimai.com.printer.enmu.FontSizeType
 import zs.qimai.com.printer.utils.PrintFormat
@@ -10,12 +9,18 @@ import java.nio.charset.Charset
 
 /****
  * 这里可以类比为画笔
+ *
+ * 可以继承此类扩展更多写法
+ *
+ * 原理 -> 创建个ByteArrayOutputStream() 先写入其中，最后在转为字节数组
+ *
  * **/
-class PrintWriter {
+open class PrintWriter {
     val CHARSET = "gbk"
     val bos = ByteArrayOutputStream()
 
     init {
+        //初始化设备
         write(PrintFormat.INITBYTE)
     }
 
@@ -29,7 +34,7 @@ class PrintWriter {
     /***
      * 0 居左 1 居中 2 居右
      * **/
-    fun printAlign(align: Int = 0): PrintWriter {
+    fun writeAlign(align: Int = 0): PrintWriter {
         when (align) {
             0 -> write(PrintFormat.LEFT_ALIGIN)
             1 -> write(PrintFormat.CENTER_ALIGIN)
@@ -38,23 +43,23 @@ class PrintWriter {
         return this
     }
 
-    fun print(value: String, charset: String = CHARSET): PrintWriter {
+    fun write(value: String, charset: String = CHARSET): PrintWriter {
         value?.let {
             bos.write(it.toByteArray(charset(charset)))
         }
         return this
     }
 
-    fun println(value: String, charset: String = CHARSET): PrintWriter {
+    fun writeln(value: String, charset: String = CHARSET): PrintWriter {
         value?.let {
             bos.write(it.toByteArray(charset(charset)))
-            printNewLine()
+            writeNewLine()
         }
 
         return this
     }
 
-    fun printNewLine(numb: Int = 1): PrintWriter {
+    fun writeNewLine(numb: Int = 1): PrintWriter {
         for (i in 0 until numb) {
             write("\n".toByteArray(Charset.defaultCharset()))
         }
@@ -66,30 +71,47 @@ class PrintWriter {
     }
 
     /***
-     *
+     *@param lineSpaceSize 行距，默认为 -1
      * ***/
     fun writelnLineText(
         value: String?,
         aligin: FontAligin = FontAligin.LEFT,
         bold: Boolean = false,
-        fontSizeType: FontSizeType = FontSizeType.FONT_0
+        fontSizeType: FontSizeType = FontSizeType.FONT_0,
+        lineSpaceSize: Int = -1
     ): PrintWriter {
         if (value.isNullOrEmpty()) {
             return this
         }
+        if (lineSpaceSize.toInt() == -1) {
+            if (fontSizeType == FontSizeType.FONT_0 || fontSizeType == FontSizeType.FONT_1) {
+                writeLineSpacingSize(50)
+            } else {
+                writeLineSpacingSize(100)
+            }
+        } else {
+            writeLineSpacingSize(lineSpaceSize)
+        }
+        // write(byteArrayOf(0x1B, 0x33, 120))
         writeAligin(aligin)
         writeFontType(fontSizeType)
         writeFontNormalOrBold(bold)
-
         //写入内容
-        print(value)
+        write(value)
         //换行
-        printNewLine(1)
+        writeNewLine(1)
         return this
     }
 
     private fun writeFontNormalOrBold(bold: Boolean) {
         if (bold) write(PrintFormat.FONT_BOLD) else write(PrintFormat.FONT_NORMAL)
+    }
+
+    /***
+     * 写入间距 默认大小是30
+     * **/
+    fun writeLineSpacingSize(nums: Int) {
+        write(byteArrayOf(0x1B, 0x33, nums.toByte()))
     }
 
     /****
@@ -121,17 +143,98 @@ class PrintWriter {
         }
     }
 
+    /***
+     * 格式化............
+     * */
+    fun formatAllLinePonit(): String? {
+        var sb = StringBuilder()
+        for (i in 0 until getPerLineMaxByteNums()) {
+            sb.append(".")
+        }
+        return sb.toString()
+    }
+
+    /****
+     * 平台的订单打印商品
+     * 要求 第一行显示商品，数量，价格
+     * 如果商品名称过程，则剩余要在第二行写
+     *
+     * ps  红烧肉      【*10】    100
+     * **/
+
+    fun formatGoods(goodsName: String, nums: String, price: String): String {
+        var formatGoodsName = fixedNumberOfDigits(goodsName, 16)
+        var numsLength = getPerLineMaxByteNums() - getBytesSize(formatGoodsName) - 10
+        var formatNums = fixedNumberOfDigits(nums, numsLength, 2)
+        var formatPrice = fixedNumberOfDigits(price, 10, 2)
+        var endGoodsName = StringBuilder()
+        if (formatGoodsName.length < goodsName.length) {
+            endGoodsName.append(goodsName.substring(formatGoodsName.length, goodsName.length))
+        }
+        return StringBuilder(formatGoodsName)
+            .append(formatNums)
+            .append(formatPrice)
+            .append(endGoodsName)
+            .toString()
+    }
+
+    /****
+     *
+     *@param values 需要修改的值
+     * @param needBytes 固定多少位  多的填充空格
+     * @param align  0 靠左 1靠中 2 靠右
+     * **/
+    private fun fixedNumberOfDigits(values: String, needBytes: Int, align: Int = 0): String {
+        var valuesSb = StringBuilder(values)
+        while (getBytesSize(valuesSb.toString()) > needBytes) {
+            valuesSb.delete(valuesSb.length - 1, valuesSb.length)
+        }
+
+        //再次判断长度 小于16位补空格
+        if (getBytesSize(valuesSb.toString()) < needBytes) {
+
+            var leaveSpace = needBytes - getBytesSize(valuesSb.toString())
+            when (align) {
+                0 -> {
+                    for (i in 0 until leaveSpace) {
+                        valuesSb.append(" ")
+                    }
+                }
+                1 -> {
+
+                    var leftSpace = leaveSpace / 2
+                    for (i in 0 until leftSpace) {
+                        valuesSb = StringBuilder(" $valuesSb")
+                    }
+                    var rightSpace = leaveSpace - leftSpace
+                    for (i in 0 until rightSpace) {
+                        valuesSb.append(" ")
+                    }
+                }
+                2 -> {
+                    for (i in 0 until leaveSpace) {
+                        valuesSb = StringBuilder(" $valuesSb")
+
+                    }
+                }
+
+            }
+
+        }
+        return valuesSb.toString()
+    }
+
     /****
      * 格式化内容 一左 一右
-     *
+     * ps   优惠券           100
      * */
-    fun formatValuesAliginLfAndAliginRight(left: String, right: String):String {
+    fun formatValuesAliginLfAndAliginRight(left: String, right: String): String {
         var maxNums = getPerLineMaxByteNums()
         var leftLength = getBytesSize(left)
         var rightLength = getBytesSize(right)
-        var spaceLength = maxNums-leftLength-rightLength
+        var spaceLength = maxNums - leftLength - rightLength
         var valuesBuilder = StringBuilder(left)
-        for (i in 0 until spaceLength){
+        for (i in 0 until spaceLength) {
             valuesBuilder.append(" ")
         }
         valuesBuilder.append(right)

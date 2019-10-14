@@ -1,8 +1,14 @@
 package zs.qimai.com.printer.executer
 
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import zs.qimai.com.printer.callback.PrintCallBack
 import zs.qimai.com.printer.manager.DeviceManager
 import zs.qimai.com.printer.manager.DeviceManagerUtils
+import zs.qimai.com.printer.utils.PrintManagerUtils
 
 /***
  * 打印执行类
@@ -21,13 +27,21 @@ open abstract class PrintExecutor {
                     it.mPrintMode == DeviceManager.ESC
                 }?.forEach {
                     if (it.mStatus) {
-                        try {
-                            it.writeData(data)
-                        } catch (e: Exception) {
-                            mPrintCallBack?.printFailed(e.message)
-                            it.closePort()
+
+                        Log.d(TAG, "execute: thread= ${Thread.currentThread().name}")
+                        GlobalScope.launch(Dispatchers.Main) {
+                            try {
+                               goToPrint(it, data)
+                                // PrintManagerUtils.getInstance().print(data)
+                            } catch (e: Exception) {
+                                mPrintCallBack?.printFailed(e.message)
+                                it.closePort()
+                                Log.d(TAG, "execute: print error e= $e")
+                            }
                         }
-                        mPrintCallBack?.printSucess(it)
+                        //it.writeData(data)
+
+                        mPrintCallBack?.printSuccess(it)
 
                     }
                 }
@@ -37,15 +51,20 @@ open abstract class PrintExecutor {
                     it.mPrintMode == DeviceManager.TSC
                 }?.forEach {
                     if (it.mStatus) {
-                        if (it.mStatus) {
+                        Log.d(TAG, "execute: thread= ${Thread.currentThread().name}")
+                        GlobalScope.launch(Dispatchers.Main) {
                             try {
-                                it.writeData(data)
+                                goToPrint(it, data)
+                                // PrintManagerUtils.getInstance().print(data)
                             } catch (e: Exception) {
                                 mPrintCallBack?.printFailed(e.message)
                                 it.closePort()
+                                Log.d(TAG, "execute: print error e= $e")
                             }
-                            mPrintCallBack?.printSucess(it)
                         }
+                        //it.writeData(data)
+
+                        mPrintCallBack?.printSuccess(it)
                     }
                 }
             }
@@ -53,5 +72,9 @@ open abstract class PrintExecutor {
         } else {
             mPrintCallBack?.printFailed("当前未有可打印设备连接")
         }
+    }
+
+    private fun goToPrint(it: DeviceManager, data: ByteArray) = GlobalScope.async(Dispatchers.IO) {
+        it.writeData(data)
     }
 }

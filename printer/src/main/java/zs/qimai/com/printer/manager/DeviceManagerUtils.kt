@@ -17,40 +17,56 @@ class DeviceManagerUtils {
 
     private val TAG = "DeviceManagerUtils"
     private var mCallBacklist: ArrayList<PrintConnOrDisCallBack> = ArrayList()
-    var lists: HashSet<DeviceManager> = HashSet()
+    var lists: java.util.ArrayList<DeviceManager> = java.util.ArrayList()
 
-    fun addDevice(deviceManager: DeviceManager?) {
+    internal fun addDevice(deviceManager: DeviceManager?) {
         deviceManager?.let {
             lists.add(deviceManager)
             notifyaddObserver(it)
         }
     }
 
-    fun removeDevice(deviceManager: DeviceManager) {
-        lists.remove(deviceManager)
-        notifyRemoveObserver(deviceManager)
-
-
+    internal fun removeDevice(device: DeviceManager) {
+        var iterator = lists.listIterator()
+        while (iterator.hasNext()) {
+            val deviceManager = iterator.next()
+            if (deviceManager == device) {
+                iterator.remove()
+                notifyRemoveObserver(device)
+            }
+        }
+        //  lists.remove(deviceManager)
     }
 
-    fun removeUsbDevice(device: UsbDevice) {
-        if (lists.size > 0) {
-            lists.forEach {
-                if (it is UsbDeviceManager) {
-                    if (it.usbDevice == device) {
-                        //closePort()会清除所有配置项，并调用removeDevice()
-                        it.closePort()
-                        // notifyRemoveObserver(it)
-                        //lists.remove(it)
-                    }
+    internal fun removeUsbDevice(device: UsbDevice) {
+
+        lists.forEach {
+            if (it is UsbDeviceManager) {
+                if (it.usbDevice == device) {
+                    //closePort()会清除所有配置项，并调用removeDevice()
+                    it.closePort()
+                    // notifyRemoveObserver(it)
+                    //lists.remove(it)
                 }
             }
-
         }
+
     }
 
 
-    fun removeBtDevice(bluetoothDevice: BluetoothDevice) {
+    internal fun removeBtDevice(bluetoothDevice: BluetoothDevice) {
+        /*if (lists.size > 0) {
+            //迭代删除
+            var iterator = lists.iterator()
+
+
+            while (iterator.hasNext()) {
+                val deviceManager = iterator.next()
+                if (deviceManager is BlueDeviceManager && deviceManager.mBlueToothDevice == bluetoothDevice) {
+                    deviceManager.closePort()
+                }
+            }
+*/
         if (lists.size > 0) {
             lists.forEach {
                 if (it is BlueDeviceManager) {
@@ -144,7 +160,8 @@ class DeviceManagerUtils {
         }
         return false
     }
-//移除所有已连接蓝牙设备 主要使用于广播检测到蓝牙开关关掉
+
+    //移除所有已连接蓝牙设备 主要使用于广播检测到蓝牙开关关掉
     fun removeAllBtDevice() {
         if (lists.size == 0) {
             return
@@ -157,27 +174,28 @@ class DeviceManagerUtils {
     }
 
     //获得通过蓝牙连接的打印机数量
-    fun getAccrodBtConNums():Int{
+    fun getAccrodBtConNums(): Int {
         var nums = 0
-        return if(lists.size==0){
+        return if (lists.size == 0) {
             nums
-        }else{
+        } else {
             lists.forEach {
-                if (it.mType==BT){
+                if (it.mType == BT) {
                     nums++
                 }
             }
             nums
         }
     }
+
     //获得通过USB连接的打印机数量
-    fun getAccrodUsbConNums():Int{
+    fun getAccrodUsbConNums(): Int {
         var nums = 0
-        return if(lists.size==0){
+        return if (lists.size == 0) {
             nums
-        }else{
+        } else {
             lists.forEach {
-                if (it.mType== USB){
+                if (it.mType == USB) {
                     nums++
                 }
             }

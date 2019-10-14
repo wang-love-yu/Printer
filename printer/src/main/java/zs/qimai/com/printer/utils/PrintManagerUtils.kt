@@ -1,5 +1,6 @@
 package zs.qimai.com.printer.utils
 
+import android.app.Application
 import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
@@ -18,8 +19,10 @@ import java.io.IOException
 import kotlin.collections.ArrayList
 import android.widget.Toast
 import zs.qimai.com.printer.callback.*
+import zs.qimai.com.printer.lifecycle.PrintLifeCycleCallBack
 import zs.qimai.com.printer.manager.UsbDeviceManager
 import zs.qimai.com.printer.receiverManager.UsbRqPermissionReceiverManager
+import java.lang.RuntimeException
 
 
 /****
@@ -30,8 +33,25 @@ class PrintManagerUtils {
     private val TAG = "PrintManagerUtils"
 
     //获取蓝牙列表
+    var application: Application? = null
+
+    fun init(application: Application) {
+        this.application = application
+        application.registerActivityLifecycleCallbacks(PrintLifeCycleCallBack())
+
+    }
+
+    /**
+     * 检查是否在application初始化过
+     * **/
+    fun checkIsInit() {
+        if (this.application == null) {
+            throw RuntimeException("请在Application 先调用init()")
+        }
+    }
 
     fun getSearchBlueToothList(callBack: BlueToothSearchCallBack? = null) {
+        checkIsInit()
         var topActivity = ActivityManagers.getInstance().getTopActivity()
         topActivity?.let {
             BlueToothLists(it).getBlueToothList(callBack)
@@ -44,6 +64,7 @@ class PrintManagerUtils {
         address: String,
         mOnBtConnectCallBack: OnBtConnectCallBack? = null
     ) {
+        checkIsInit()
 
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         bluetoothAdapter?.cancelDiscovery()
@@ -54,6 +75,8 @@ class PrintManagerUtils {
     }
 
     fun getSearchUsbList(usbSearchCallBack: UsbSearchCallBack? = null) {
+        checkIsInit()
+
         usbSearchCallBack?.onSearchStart()
         ActivityManagers.getInstance().getTopActivity()?.let {
             var manager: UsbManager = it.getSystemService(Context.USB_SERVICE) as UsbManager
@@ -76,6 +99,7 @@ class PrintManagerUtils {
         usbDevice: UsbDevice,
         mUsbPrintConnCallBack: UsbPrintConnCallBack? = null
     ) {
+        checkIsInit()
         //连接开始
         mUsbPrintConnCallBack?.onConnStart()
         //先判断当前设备是否已经保存过
@@ -127,6 +151,8 @@ class PrintManagerUtils {
         usbDevice: UsbDevice,
         mUsbPrintConnCallBack: UsbPrintConnCallBack? = null
     ) {
+        checkIsInit()
+
         UsbDeviceManager().apply {
             this.usbDevice = usbDevice
             this.address = address
@@ -167,28 +193,33 @@ class PrintManagerUtils {
         }
     }
 
+    /***
+     * 遍历获取设备打印
+     * **/
     fun print(data: ByteArray) {
 
-        for (item in DeviceManagerUtils.getInstance().lists) {
+     //   for (item in DeviceManagerUtils.getInstance().lists) {
 
-            PrintThreadPool.getInstance().addTask(Runnable {
-                Log.d(TAG, "doPrint: threadName= ${Thread.currentThread().name}")
-                if (item.mStatus && data.isNotEmpty()) {
-                    try {
-                        Log.d(TAG, "print: print beigin threadName= ${Thread.currentThread().name}")
-                        item.writeData(data)
-                    } catch (e: IOException) {
-                        //打印异常 关闭连接
-                        item.closePort()
-                        // throw IOException("打印失败")
+            //item.writeData(data)
+
+            /*    PrintThreadPool.getInstance().addTask(Runnable {
+                    Log.d(TAG, "doPrint: threadName= ${Thread.currentThread().name}")
+                    if (item.mStatus && data.isNotEmpty()) {
+                        try {
+                            Log.d(TAG, "print: print beigin threadName= ${Thread.currentThread().name}")
+                            item.writeData(data)
+                        } catch (e: IOException) {
+                            //打印异常 关闭连接
+                            item.closePort()
+                            // throw IOException("打印失败")
+                        }
+
+                        Log.d(TAG, "print: finish threadName= ${Thread.currentThread().name}")
                     }
-
-                    Log.d(TAG, "print: finish threadName= ${Thread.currentThread().name}")
-                }
-            })
+                })*/
 
 
-        }
+     //   }
 
 
     }
@@ -219,7 +250,6 @@ class PrintManagerUtils {
         const val PRINT_MODE_NOT_SUPPORT = 18
         //该设备已经连接过
         const val BT_DEVICE_ALREAD_CONN = 19
-
 
         //usb相关
         //该设备已经连接过

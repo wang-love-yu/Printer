@@ -5,6 +5,6 @@ import zs.qimai.com.printer.manager.UsbDeviceManager
 
 interface PrintCallBack {
 
-    fun printSucess(deviceManager: DeviceManager)
+    fun printSuccess(deviceManager: DeviceManager)
     fun printFailed(msg:String? = null)
 }

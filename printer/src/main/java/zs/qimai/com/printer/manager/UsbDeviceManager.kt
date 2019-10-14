@@ -23,7 +23,6 @@ class UsbDeviceManager(override var mType: Int = USB) : DeviceManager() {
     override fun openPort() {
         Log.d(TAG, "openPort: ")
         usbDevice?.let {
-
             if (it.interfaceCount != 0) {
                 mmIntf = it.getInterface(0)
                 if (mmIntf != null) {
@@ -43,7 +42,6 @@ class UsbDeviceManager(override var mType: Int = USB) : DeviceManager() {
                                 }
                             }
                         }
-
                     }
                 }
             }
@@ -94,8 +92,9 @@ class UsbDeviceManager(override var mType: Int = USB) : DeviceManager() {
             200
         ) else 0
     }
-    override fun writeData(bytes: ByteArray)  {
-        this.mmConnection!!.bulkTransfer(
+
+    override fun writeData(bytes: ByteArray) {
+         this.mmConnection!!.bulkTransfer(
             this.mmEndOut,
             bytes,
             bytes.size,

@@ -132,42 +132,83 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
      * 这里是去连接打印机
      * ***/
     private fun connectBt(it: BluetoothDevice) {
-        mBluetoothSocket = it.createRfcommSocketToServiceRecord(uuid)
-        mBluetoothSocket?.let {
-            try {
-                //发起连接
-                it.connect()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            mBluetoothSocket = getBtSocket(it)
+            if (mBluetoothSocket != null) {
                 try {
-                    mOutPutStream = it.outputStream
-                    mInPutStream = it.inputStream
+                    mBluetoothSocket!!.connect()
+                    mOutPutStream = mBluetoothSocket!!.outputStream
+                    mInPutStream = mBluetoothSocket!!.inputStream
+                    //到这里说明配对并连接成功 判断打印机模式
+                    PrinterStatusUtils(this@BlueDeviceManager).apply {
+                        mPrintStatusCallBack = object : PrintStatusCallBack {
+                            override fun searchResult(status: Int?) {
+                                Log.d(TAG, "searchResult: status= $status")
+                                status?.let {
+                                    handleConnectSuccess(status)
+                                } ?: handleUnknownStatus()
+                            }
+                        }
+                        queryStatus()
+                    }
                 } catch (e: IOException) {
-                    mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.IO_ERROR, "获取流失败")
+                    mOnBtConnectCallBack?.onConnectError(
+                        PrintManagerUtils.SOCKET_ERROR,
+                        "socket连接异常"
+                    )
                     closePort()
                     mStatus = false
                 }
-
-            } catch (e: IOException) {
-                mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.SOCKET_ERROR, "socket连接异常")
-                closePort()
-                mStatus = false
+            } else {
+                mOnBtConnectCallBack?.onConnectError(
+                    PrintManagerUtils.SOCKET_NOT_FOUND,
+                    "获取不到socket"
+                )
             }
+        }
+        /* mBluetoothSocket = it.createRfcommSocketToServiceRecord(uuid)
+         mBluetoothSocket?.let {
+             try {
+                 //发起连接
+                 it.connect()
+                 try {
+                     mOutPutStream = it.outputStream
+                     mInPutStream = it.inputStream
+                 } catch (e: IOException) {
+                     mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.IO_ERROR, "获取流失败")
+                     closePort()
+                     mStatus = false
+                 }
 
-            //到这里说明配对并连接成功 判断打印机模式
-            PrinterStatusUtils(this).apply {
-                mPrintStatusCallBack = object : PrintStatusCallBack {
-                    override fun searchResult(status: Int?) {
-                        Log.d(TAG, "searchResult: status= $status")
-                        status?.let {
-                            handleConnectSuccess(status)
-                        } ?: handleUnknownStatus()
-                    }
-                }
-                queryStatus()
-            }
+             } catch (e: IOException) {
+                 mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.SOCKET_ERROR, "socket连接异常")
+                 closePort()
+                 mStatus = false
+             }
+
+             //到这里说明配对并连接成功 判断打印机模式
+             PrinterStatusUtils(this).apply {
+                 mPrintStatusCallBack = object : PrintStatusCallBack {
+                     override fun searchResult(status: Int?) {
+                         Log.d(TAG, "searchResult: status= $status")
+                         status?.let {
+                             handleConnectSuccess(status)
+                         } ?: handleUnknownStatus()
+                     }
+                 }
+                 queryStatus()
+             }
 
 
-        } ?: mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.SOCKET_NOT_FOUND, "获取不到socket")
+         } ?: mOnBtConnectCallBack?.onConnectError(PrintManagerUtils.SOCKET_NOT_FOUND, "获取不到socket")*/
     }
+
+
+    private suspend fun getBtSocket(it: BluetoothDevice) =
+        withContext(Dispatchers.IO) {
+            it.createRfcommSocketToServiceRecord(uuid)
+        }
 
     override fun writeData(bytes: ByteArray) {
         this.mOutPutStream?.write(bytes)

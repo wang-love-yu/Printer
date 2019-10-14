@@ -14,7 +14,7 @@ import zs.qimai.com.printer.executer.PrintExecutor
 import zs.qimai.com.printer.manager.DeviceManager
 import zs.qimai.com.printer.manager.DeviceManagerUtils
 
-class MainActivity : AppCompatActivity() , PrintConnOrDisCallBack {
+class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
     override fun onConectPrint(device: DeviceManager) {
 
         Log.d(TAG, "onConectPrint: device= $device")
@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() , PrintConnOrDisCallBack {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         DeviceManagerUtils.getInstance().addConnectStatusCallBack(this)
         tv_connect_bt.setOnClickListener {
             startActivity(Intent(this, BtListActivity::class.java))
@@ -38,31 +37,26 @@ class MainActivity : AppCompatActivity() , PrintConnOrDisCallBack {
             // PrintExecutor().doPrint(LabelTemplete())
             val task = object : PrintExecutor() {
                 override fun covertEscData(): ByteArray? {
-                    return TestPrintTemplate().getPrintData()
+                    return TestPrintTemplate().getPrintData("122")
                 }
 
                 override fun convertTscData(): ByteArray? {
-                    return LabelTemplete().getPrintData()
+                    return LabelTemplete().getPrintData("Test")
                 }
             }
             task.mPrintCallBack = object : PrintCallBack {
-                override fun printSucess(deviceManager: DeviceManager) {
-                    Log.d(TAG, "printSucess: deviceManager = $deviceManager")
+                override fun printSuccess(deviceManager: DeviceManager) {
+                    Log.d(TAG, "printSuccess: deviceManager = $deviceManager")
                 }
 
                 override fun printFailed(msg: String?) {
                     Log.d(TAG, "printFailed: msg= $msg")
-                    
                 }
-
             }
             task.execute()
-
-
         }
         tv_connect_usb.setOnClickListener {
             startActivity(Intent(this, UsbActivity::class.java))
-
         }
 
         GlobalScope.launch(Dispatchers.IO) {

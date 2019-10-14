@@ -15,7 +15,6 @@ abstract class DeviceManager {
     var address: String? = null
     var mPrintMode: Int? = null
     abstract var mType: Int
-    private var mBluetoothAdapter: BluetoothAdapter? = null
 
     companion object {
         //小票模式
@@ -26,7 +25,6 @@ abstract class DeviceManager {
         val BT = 1
         //usb
         val USB = 2
-
     }
 
     //连接

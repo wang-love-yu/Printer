@@ -1,0 +1,43 @@
+package zs.qimai.com.printer.lifecycle
+
+import android.app.Activity
+import android.app.Application
+import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.FragmentActivity
+import java.lang.RuntimeException
+
+class PrintLifeCycleCallBack: Application.ActivityLifecycleCallbacks {
+    override fun onActivityPaused(activity: Activity) {
+
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+
+        if (activity is FragmentActivity) {
+            ActivityManagers.getInstance().removeActivity(activity)
+        } else {
+            throw RuntimeException("仅支持Androidx Activity")
+        }
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+    }
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        if (activity is FragmentActivity) {
+            ActivityManagers.getInstance().addActivity(activity)
+        } else {
+            throw RuntimeException("仅支持Androidx Activity")
+        }
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+    }
+}

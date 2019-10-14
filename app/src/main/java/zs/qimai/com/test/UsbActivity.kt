@@ -3,6 +3,7 @@ package zs.qimai.com.test
 import android.hardware.usb.UsbDevice
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +11,31 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_usb.*
+import zs.qimai.com.printer.callback.UsbPrintConnCallBack
 import zs.qimai.com.printer.utils.PrintManagerUtils
 import zs.qimai.com.printer.callback.UsbSearchCallBack
+import zs.qimai.com.printer.manager.UsbDeviceManager
 
 class UsbActivity : AppCompatActivity(), View.OnClickListener {
     private val TAG = "UsbActivity"
     override fun onClick(v: View?) {
         (v!!.tag as? String)?.let {
-            PrintManagerUtils.getInstance().usbConnect(it, datas[it]!!)
+            PrintManagerUtils.getInstance().usbConnect(it, datas[it]!!,object: UsbPrintConnCallBack{
+                override fun onConnStart() {
+
+                }
+
+                override fun onConnSucess(usbDeviceManager: UsbDeviceManager) {
+                    Log.d(TAG, "onConnSucess: ")
+                    finish()
+                }
+
+                override fun onConnFailed(code: Int, error: String) {
+                    Log.d(TAG, "onConnFailed:code= $code msg= $error")
+
+                }
+
+            })
         }
         //datas[v!!.tag as String]?.let {  }
     }
