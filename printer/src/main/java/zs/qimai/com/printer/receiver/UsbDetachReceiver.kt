@@ -14,7 +14,7 @@ class UsbDetachReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         // This method is called when the BroadcastReceiver is receiving an Intent broadcast.
         Log.d(TAG, "onReceive: intent.action = ${intent.action}")
-            //如果存在移除usb设备，则需要去连接设备管理中移除
+        //如果存在移除usb设备，则需要去连接设备管理中移除
         if (intent.action == UsbManager.ACTION_USB_DEVICE_DETACHED) {
             val mUsbDevice = intent.getParcelableExtra<UsbDevice?>(UsbManager.EXTRA_DEVICE)
             Log.d(TAG, "onReceive:  ACTION_USB_DEVICE_DETACHED mUsbDevice = ${mUsbDevice}")
@@ -25,9 +25,9 @@ class UsbDetachReceiver : BroadcastReceiver() {
         }
         if (intent.action == UsbManager.ACTION_USB_DEVICE_ATTACHED) {
             val mUsbDevice = intent.getParcelableExtra<UsbDevice?>(UsbManager.EXTRA_DEVICE)
-            Log.d(TAG, "onReceive:  ACTION_USB_DEVICE_ATTACHED mUsbDevice = ${mUsbDevice}")
-            PrintManagerUtils.getInstance().usbConnect(mUsbDevice?.deviceName!!,mUsbDevice)
-
+            if (PrintManagerUtils.getInstance().detachUsbDeviceAutoConn) {
+                PrintManagerUtils.getInstance().usbConnect(mUsbDevice?.deviceName!!, mUsbDevice)
+            }
         }
     }
 }

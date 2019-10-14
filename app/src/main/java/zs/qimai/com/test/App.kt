@@ -7,7 +7,9 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        PrintManagerUtils.getInstance().init(this)
+        PrintManagerUtils.getInstance().apply {
+            init(this@App)
+        }
     }
 
 }

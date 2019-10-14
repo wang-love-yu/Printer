@@ -54,7 +54,51 @@ class DeviceManagerUtils {
     }
 
 
-    internal fun removeBtDevice(bluetoothDevice: BluetoothDevice) {
+    private fun getBtDevice(address: String): BlueDeviceManager? {
+        if (lists.size > 0) {
+            return null
+        } else {
+            lists.forEach {
+
+                if (it.address == address && it is BlueDeviceManager) {
+                    return it
+                }
+            }
+
+        }
+        return null
+    }
+
+
+    internal fun removeBtDevice(address: String) {
+        var device = getBtDevice(address)
+        device?.closePort()
+    }
+
+    private fun getUsbDevice(address: String): UsbDeviceManager? {
+        if (lists.size > 0) {
+            return null
+        } else {
+            lists.forEach {
+
+                if (it.address == address && it is UsbDeviceManager) {
+                    return it
+                }
+            }
+
+        }
+        return null
+    }
+    internal fun removeUsbDevice(address: String) {
+        var device = getUsbDevice(address)
+        device?.closePort()
+    }
+
+    internal fun removeBtDevice(bluetoothDevice: BluetoothDevice?) {
+
+        if (bluetoothDevice == null) {
+            return
+        }
         /*if (lists.size > 0) {
             //迭代删除
             var iterator = lists.iterator()

@@ -32,13 +32,13 @@ import java.lang.RuntimeException
 class PrintManagerUtils {
     private val TAG = "PrintManagerUtils"
 
-    //获取蓝牙列表
+    //这里指运行中检测到usb设备接入，自动连接
+    var detachUsbDeviceAutoConn = true
     var application: Application? = null
-
-    fun init(application: Application) {
+    fun init(application: Application): PrintManagerUtils {
         this.application = application
         application.registerActivityLifecycleCallbacks(PrintLifeCycleCallBack())
-
+        return this
     }
 
     /**
@@ -59,13 +59,13 @@ class PrintManagerUtils {
     }
 
     //蓝牙连接
+    @JvmOverloads
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun btConnect(
         address: String,
         mOnBtConnectCallBack: OnBtConnectCallBack? = null
     ) {
         checkIsInit()
-
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         bluetoothAdapter?.cancelDiscovery()
         BlueDeviceManager().apply {
@@ -74,16 +74,22 @@ class PrintManagerUtils {
         }.openPort()
     }
 
+    fun closeBtConn(address: String) {
+        DeviceManagerUtils.getInstance().removeBtDevice(address)
+    }
+
+    fun closeUsbConn(address: String) {
+        DeviceManagerUtils.getInstance().removeUsbDevice(address)
+    }
+
+    @JvmOverloads
     fun getSearchUsbList(usbSearchCallBack: UsbSearchCallBack? = null) {
         checkIsInit()
-
         usbSearchCallBack?.onSearchStart()
         ActivityManagers.getInstance().getTopActivity()?.let {
             var manager: UsbManager = it.getSystemService(Context.USB_SERVICE) as UsbManager
             var map = manager.deviceList
             for ((key, value) in map) {
-
-                Log.d(TAG, "getSearchUsbList: key= $key value= $value")
                 //等于7说明是打印设备
                 if (value.getInterface(0).interfaceClass == 7) {
                     usbSearchCallBack?.onSearchFound(key, value)
@@ -94,6 +100,7 @@ class PrintManagerUtils {
         }
     }
 
+    @JvmOverloads
     fun usbConnect(
         address: String,
         usbDevice: UsbDevice,
@@ -172,56 +179,14 @@ class PrintManagerUtils {
         return context.hasPermission(usbDevice)
     }
 
+    fun setConnectStatusCallBack(callBack: PrintConnOrDisCallBack) {
 
-    fun print(data: ArrayList<ByteArray>) {
-        //未连接
-        for (item in DeviceManagerUtils.getInstance().lists) {
-            if (item.mStatus && data.isNotEmpty()) {
-                try {
-                    for (i in data) {
-                        item.writeData(i)
-                    }
-                } catch (e: IOException) {
-                    //打印异常 关闭连接
-                    Log.d(TAG, "print: e= ${e.message}")
-                    item.closePort()
-                    // throw IOException("打印失败")
-                }
-
-            }
-
-        }
+        DeviceManagerUtils.getInstance().addConnectStatusCallBack(callBack)
     }
 
-    /***
-     * 遍历获取设备打印
-     * **/
-    fun print(data: ByteArray) {
+    fun removeConnectStatusCallBack(callBack: PrintConnOrDisCallBack) {
 
-     //   for (item in DeviceManagerUtils.getInstance().lists) {
-
-            //item.writeData(data)
-
-            /*    PrintThreadPool.getInstance().addTask(Runnable {
-                    Log.d(TAG, "doPrint: threadName= ${Thread.currentThread().name}")
-                    if (item.mStatus && data.isNotEmpty()) {
-                        try {
-                            Log.d(TAG, "print: print beigin threadName= ${Thread.currentThread().name}")
-                            item.writeData(data)
-                        } catch (e: IOException) {
-                            //打印异常 关闭连接
-                            item.closePort()
-                            // throw IOException("打印失败")
-                        }
-
-                        Log.d(TAG, "print: finish threadName= ${Thread.currentThread().name}")
-                    }
-                })*/
-
-
-     //   }
-
-
+        DeviceManagerUtils.getInstance().removeConnectStatusCallBack(callBack)
     }
 
     companion object {
