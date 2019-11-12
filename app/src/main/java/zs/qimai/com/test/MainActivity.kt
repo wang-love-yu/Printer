@@ -12,15 +12,22 @@ import zs.qimai.com.printer.canvas.LabelTemplete
 import zs.qimai.com.printer.canvas.TestPrintTemplate
 import zs.qimai.com.printer.executer.PrintExecutor
 import zs.qimai.com.printer.manager.DeviceManager
+import zs.qimai.com.printer.manager.DeviceManager.Companion.BT
+import zs.qimai.com.printer.manager.DeviceManager.Companion.USB
 import zs.qimai.com.printer.manager.DeviceManagerUtils
+import zs.qimai.com.printer.utils.PrintManagerUtils
 
 class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
-    override fun onConectPrint(device: DeviceManager) {
 
+    private var list = ArrayList<DeviceManager>()
+
+    override fun onConectPrint(device: DeviceManager) {
+        list.add(device)
         Log.d(TAG, "onConectPrint: device= $device")
     }
 
     override fun onDisPrint(device: DeviceManager) {
+        list.remove(device)
         Log.d(TAG, "onDisPrint: device= $device")
     }
 
@@ -57,6 +64,22 @@ class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
         }
         tv_connect_usb.setOnClickListener {
             startActivity(Intent(this, UsbActivity::class.java))
+        }
+
+        tv_disconnect_bt.setOnClickListener {
+            list.forEach {
+                if (it.mType == BT) {
+                    PrintManagerUtils.getInstance().closeBtConn(it.address!!)
+                }
+            }
+        }
+
+        tv_disconnect_usb.setOnClickListener {
+            list.forEach {
+                if (it.mType == USB) {
+                    PrintManagerUtils.getInstance().closeUsbConn(it.address!!)
+                }
+            }
         }
 
         GlobalScope.launch(Dispatchers.IO) {

@@ -55,7 +55,7 @@ class DeviceManagerUtils {
 
 
     private fun getBtDevice(address: String): BlueDeviceManager? {
-        if (lists.size > 0) {
+        if (lists.isNullOrEmpty()) {
             return null
         } else {
             lists.forEach {
@@ -76,7 +76,7 @@ class DeviceManagerUtils {
     }
 
     private fun getUsbDevice(address: String): UsbDeviceManager? {
-        if (lists.size > 0) {
+        if (lists.isNullOrEmpty()) {
             return null
         } else {
             lists.forEach {
@@ -175,7 +175,7 @@ class DeviceManagerUtils {
      * 判断是否已经连接的usb设备
      * */
     fun isContainerUsbDevice(address: String, mUsbDevice: UsbDevice): Boolean {
-        if (lists.size == null) {
+        if (lists.isNullOrEmpty()) {
             return false
         }
         lists.forEach {
@@ -192,7 +192,7 @@ class DeviceManagerUtils {
      * 判断是否已经连接的蓝牙设备
      * */
     fun isContainerBtDevice(address: String): Boolean {
-        if (lists.size == 0) {
+        if (lists.isNullOrEmpty()) {
             return false
         }
         lists.forEach {
@@ -207,7 +207,7 @@ class DeviceManagerUtils {
 
     //移除所有已连接蓝牙设备 主要使用于广播检测到蓝牙开关关掉
     fun removeAllBtDevice() {
-        if (lists.size == 0) {
+        if (lists.isNullOrEmpty()) {
             return
         }
         lists.forEach {

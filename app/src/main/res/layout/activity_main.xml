@@ -21,6 +21,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tv_disconnect_bt"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="蓝牙关闭"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/tv_connect_usb"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -32,7 +45,18 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
+    <TextView
+        android:id="@+id/tv_disconnect_usb"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="USB关闭"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:textColor="#000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:layout_marginTop="10dp"
         android:id="@+id/tv_print"

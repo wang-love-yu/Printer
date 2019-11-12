@@ -128,6 +128,17 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
     }
 
 
+    private fun connect(it: BluetoothDevice) {
+
+
+        GlobalScope.launch {
+
+
+        }
+
+
+    }
+
     /****
      * 这里是去连接打印机
      * ***/
@@ -137,7 +148,9 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
             mBluetoothSocket = getBtSocket(it)
             if (mBluetoothSocket != null) {
                 try {
-                    mBluetoothSocket!!.connect()
+                    withContext(Dispatchers.IO) {
+                        mBluetoothSocket!!.connect()
+                    }
                     mOutPutStream = mBluetoothSocket!!.outputStream
                     mInPutStream = mBluetoothSocket!!.inputStream
                     //到这里说明配对并连接成功 判断打印机模式
@@ -153,6 +166,7 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
                         queryStatus()
                     }
                 } catch (e: IOException) {
+                    Log.d(TAG, "connectBt: e= $e")
                     mOnBtConnectCallBack?.onConnectError(
                         PrintManagerUtils.SOCKET_ERROR,
                         "socket连接异常"
