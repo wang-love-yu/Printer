@@ -14,11 +14,11 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_bt_list.*
-import zs.qimai.com.printer.utils.PrintManagerUtils
-import zs.qimai.com.printer.callback.BlueToothSearchCallBack
-import zs.qimai.com.printer.callback.OnBtConnectCallBack
-import zs.qimai.com.printer.manager.BlueDeviceManager
-import zs.qimai.com.printer.manager.DeviceManager
+import zs.qimai.com.printer2.utils.PrintManagerUtils
+import zs.qimai.com.printer2.callback.BlueToothSearchCallBack
+import zs.qimai.com.printer2.callback.OnBtConnectCallBack
+import zs.qimai.com.printer2.manager.BlueDeviceManager
+import zs.qimai.com.printer2.manager.DeviceManager
 import java.util.ArrayList
 import java.util.HashSet
 

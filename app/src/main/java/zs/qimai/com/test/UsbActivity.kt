@@ -11,10 +11,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_usb.*
-import zs.qimai.com.printer.callback.UsbPrintConnCallBack
-import zs.qimai.com.printer.utils.PrintManagerUtils
-import zs.qimai.com.printer.callback.UsbSearchCallBack
-import zs.qimai.com.printer.manager.UsbDeviceManager
+import zs.qimai.com.printer2.callback.UsbPrintConnCallBack
+import zs.qimai.com.printer2.utils.PrintManagerUtils
+import zs.qimai.com.printer2.callback.UsbSearchCallBack
+import zs.qimai.com.printer2.manager.UsbDeviceManager
 
 class UsbActivity : AppCompatActivity(), View.OnClickListener {
     private val TAG = "UsbActivity"

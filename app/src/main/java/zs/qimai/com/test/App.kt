@@ -1,7 +1,7 @@
 package zs.qimai.com.test
 
 import android.app.Application
-import zs.qimai.com.printer.utils.PrintManagerUtils
+import zs.qimai.com.printer2.utils.PrintManagerUtils
 
 class App : Application() {
 

@@ -6,16 +6,16 @@ import android.os.Bundle
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import zs.qimai.com.printer.callback.PrintCallBack
-import zs.qimai.com.printer.callback.PrintConnOrDisCallBack
-import zs.qimai.com.printer.canvas.LabelTemplete
-import zs.qimai.com.printer.canvas.TestPrintTemplate
-import zs.qimai.com.printer.executer.PrintExecutor
-import zs.qimai.com.printer.manager.DeviceManager
-import zs.qimai.com.printer.manager.DeviceManager.Companion.BT
-import zs.qimai.com.printer.manager.DeviceManager.Companion.USB
-import zs.qimai.com.printer.manager.DeviceManagerUtils
-import zs.qimai.com.printer.utils.PrintManagerUtils
+import zs.qimai.com.printer2.callback.PrintCallBack
+import zs.qimai.com.printer2.callback.PrintConnOrDisCallBack
+import zs.qimai.com.printer2.canvas.LabelTemplete
+import zs.qimai.com.printer2.canvas.TestPrintTemplate
+import zs.qimai.com.printer2.executer.PrintExecutor
+import zs.qimai.com.printer2.manager.DeviceManager
+import zs.qimai.com.printer2.manager.DeviceManager.Companion.BT
+import zs.qimai.com.printer2.manager.DeviceManager.Companion.USB
+import zs.qimai.com.printer2.manager.DeviceManagerUtils
+import zs.qimai.com.printer2.utils.PrintManagerUtils
 
 class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
 
