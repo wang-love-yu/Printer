@@ -150,9 +150,11 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
                 try {
                     withContext(Dispatchers.IO) {
                         mBluetoothSocket!!.connect()
+                        Log.d(TAG, "connectBt: mBluetoothSocket connect finish")
                     }
                     mOutPutStream = mBluetoothSocket!!.outputStream
                     mInPutStream = mBluetoothSocket!!.inputStream
+                    Log.d(TAG, "connectBt: mBluetoothSocket connect success callback")
                     handleConnectSuccess(null)
                     //到这里说明配对并连接成功 判断打印机模式
               /*      PrinterStatusUtils(this@BlueDeviceManager).apply {
