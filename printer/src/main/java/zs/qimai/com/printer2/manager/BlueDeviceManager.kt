@@ -153,6 +153,7 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
                     }
                     mOutPutStream = mBluetoothSocket!!.outputStream
                     mInPutStream = mBluetoothSocket!!.inputStream
+                    handleConnectSuccess(null)
                     //到这里说明配对并连接成功 判断打印机模式
               /*      PrinterStatusUtils(this@BlueDeviceManager).apply {
                         mPrintStatusCallBack = object : PrintStatusCallBack {
@@ -232,7 +233,7 @@ class BlueDeviceManager(override var mType: Int = BT) : DeviceManager() {
     /****
      * 配置一些成功连接属性
      * */
-    private fun handleConnectSuccess(status: Int) {
+    private fun handleConnectSuccess(status: Int?) {
         mStatus = true
         mPrintMode = status
         mOnBtConnectCallBack?.onConnectSuccess(this@BlueDeviceManager)
