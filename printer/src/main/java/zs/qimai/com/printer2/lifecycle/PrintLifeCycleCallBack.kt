@@ -19,7 +19,7 @@ class PrintLifeCycleCallBack: Application.ActivityLifecycleCallbacks {
         if (activity is FragmentActivity) {
             ActivityManagers.getInstance().removeActivity(activity)
         } else {
-            throw RuntimeException("仅支持Androidx Activity")
+            //throw RuntimeException("仅支持Androidx Activity")
         }
     }
 
@@ -33,7 +33,7 @@ class PrintLifeCycleCallBack: Application.ActivityLifecycleCallbacks {
         if (activity is FragmentActivity) {
             ActivityManagers.getInstance().addActivity(activity)
         } else {
-            throw RuntimeException("仅支持Androidx Activity")
+            //throw RuntimeException("仅支持Androidx Activity")
         }
     }
 
