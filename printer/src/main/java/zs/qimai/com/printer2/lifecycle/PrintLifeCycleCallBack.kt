@@ -4,9 +4,12 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import java.lang.RuntimeException
+import androidx.lifecycle.LifecycleOwner
 
-class PrintLifeCycleCallBack: Application.ActivityLifecycleCallbacks {
+/*****
+ * 这里的Activity只支持支持实现LifeCycle的Activity
+ * **/
+class PrintLifeCycleCallBack : Application.ActivityLifecycleCallbacks {
     override fun onActivityPaused(activity: Activity) {
 
     }
@@ -16,10 +19,8 @@ class PrintLifeCycleCallBack: Application.ActivityLifecycleCallbacks {
 
     override fun onActivityDestroyed(activity: Activity) {
 
-        if (activity is FragmentActivity) {
-            ActivityManagers.getInstance().removeActivity(activity)
-        } else {
-            //throw RuntimeException("仅支持Androidx Activity")
+        if (activity is LifecycleOwner) {
+            ActivityManagers.getInstance().removeActivity(activity as FragmentActivity)
         }
     }
 
@@ -30,8 +31,8 @@ class PrintLifeCycleCallBack: Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (activity is FragmentActivity) {
-            ActivityManagers.getInstance().addActivity(activity)
+        if (activity is LifecycleOwner) {
+            ActivityManagers.getInstance().addActivity(activity as FragmentActivity)
         } else {
             //throw RuntimeException("仅支持Androidx Activity")
         }
