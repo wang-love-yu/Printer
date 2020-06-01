@@ -2,7 +2,7 @@
 
 ## 使用方法
 #### 初始化
-1. 在Application 中初始化 PrintManagerUtils.getInstance().init(BaseApplication.getApplication() as Application)
+1. 在Application 中初始化 PrintManagerUtils.getInstance().init(this)
 #### 获取设备与连接
 2. 获取蓝牙打印机列表 PrintManagerUtils.getInstance().getSearchBlueToothList()   连接蓝牙打印机PrintManagerUtils.getInstance().btConnect（）
 3. 获取USB打印机列表PrintManagerUtils.getInstance().getSearchUsbList()   连接USB打印机 PrintManagerUtils.getInstance().usbConnect（）
