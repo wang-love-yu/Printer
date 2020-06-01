@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_usb.*
 import zs.qimai.com.printer2.callback.UsbPrintConnCallBack
 import zs.qimai.com.printer2.utils.PrintManagerUtils
 import zs.qimai.com.printer2.callback.UsbSearchCallBack
+import zs.qimai.com.printer2.callback.UsbSearchCallBack2
 import zs.qimai.com.printer2.manager.UsbDeviceManager
 
 class UsbActivity : AppCompatActivity(), View.OnClickListener {
@@ -47,25 +48,50 @@ class UsbActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_usb)
         rv_list.layoutManager = LinearLayoutManager(this@UsbActivity)
         rv_list.adapter = adapter
-        PrintManagerUtils.getInstance().getSearchUsbList(object : UsbSearchCallBack {
-            override fun onSearchStart() {
+        PrintManagerUtils.getInstance().getSearchUsbList(object : UsbSearchCallBack2 {
+            override fun onSearchFoundAll(devices: HashMap<String, UsbDevice>?) {
+                Log.d(TAG, "onSearchFoundAll: ")
+            }
 
+            override fun onSearchStart() {
+                Log.d(TAG, "onSearchStart: ")
             }
 
             override fun onSearchFound(address: String, usbDevice: UsbDevice) {
                 datas[address] = usbDevice
                 adapter.notifyDataSetChanged()
+                Log.d(TAG, "onSearchFound: ")
             }
 
             override fun onSearchError(errCode: Int, errMsg: String?) {
+                Log.d(TAG, "onSearchError: ")
             }
 
             override fun onSearchFinish() {
+                Log.d(TAG, "onSearchFinish: ")
             }
-
         })
 
+        PrintManagerUtils.getInstance().getSearchUsbList(object : UsbSearchCallBack {
 
+            override fun onSearchStart() {
+                Log.d(TAG, "onSearchStart1: ")
+            }
+
+            override fun onSearchFound(address: String, usbDevice: UsbDevice) {
+                datas[address] = usbDevice
+                adapter.notifyDataSetChanged()
+                Log.d(TAG, "onSearchFound1: ")
+            }
+
+            override fun onSearchError(errCode: Int, errMsg: String?) {
+                Log.d(TAG, "onSearchError1: ")
+            }
+
+            override fun onSearchFinish() {
+                Log.d(TAG, "onSearchFinish1: ")
+            }
+        })
     }
 
     inner class Adapter : RecyclerView.Adapter<ViewHolder>() {

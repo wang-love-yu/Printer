@@ -16,6 +16,7 @@ import zs.qimai.com.printer2.manager.BlueDeviceManager
 import zs.qimai.com.printer2.manager.DeviceManagerUtils
 import zs.qimai.com.printer2.callback.*
 import zs.qimai.com.printer2.lifecycle.PrintLifeCycleCallBack
+import zs.qimai.com.printer2.manager.DeviceManager
 import zs.qimai.com.printer2.manager.UsbDeviceManager
 import zs.qimai.com.printer2.receiverManager.UsbRqPermissionReceiverManager
 import java.lang.RuntimeException
@@ -78,6 +79,13 @@ class PrintManagerUtils {
         DeviceManagerUtils.getInstance().removeUsbDevice(address)
     }
 
+    /*****
+     *
+     * 获取Usb列表
+     *
+     * @param usbSearchCallBack 这里可传入UsbSearchCallBack/UsbSearchCallBack2 （如果想要获取全部Usb列表则可以传入UsbSearchCallBack2）
+     * **/
+
     @JvmOverloads
     fun getSearchUsbList(usbSearchCallBack: UsbSearchCallBack? = null) {
         checkIsInit()
@@ -85,14 +93,19 @@ class PrintManagerUtils {
         ActivityManagers.getInstance().getTopActivity()?.let {
             var manager: UsbManager = it.getSystemService(Context.USB_SERVICE) as UsbManager
             var map = manager.deviceList
+            var listMap = HashMap<String, UsbDevice>()
             for ((key, value) in map) {
                 //等于7说明是打印设备
                 if (value.getInterface(0).interfaceClass == 7) {
                     usbSearchCallBack?.onSearchFound(key, value)
+                    listMap[key] = value
                 }
             }
+            //如果传入的是UsbSearchCallBack2 则返回全部支持的列表
+            if (usbSearchCallBack is UsbSearchCallBack2) {
+                usbSearchCallBack?.onSearchFoundAll(listMap)
+            }
             usbSearchCallBack?.onSearchFinish()
-
         }
     }
 
@@ -195,30 +208,41 @@ class PrintManagerUtils {
 
         //该硬件不支持蓝牙
         const val HARDWARE_NOT_SUPPORT = 11
+
         //根据地址获取不到设备
         const val DEVICE_NOT_FIND = 12
+
         //弹窗异常或者密码错误
         const val BOND_NONE = 13
+
         //获取不到socket
         const val SOCKET_NOT_FOUND = 14
+
         //socket连接异常
         const val SOCKET_ERROR = 15
+
         //获取流失败
         const val IO_ERROR = 16
+
         //获取不到Activity
         const val ACTIVITY_NOT_FOUND = 17
+
         //获取不到该打印机支持的模式 ps ESC(小票) TSC(标签)
         const val PRINT_MODE_NOT_SUPPORT = 18
+
         //该设备已经连接过
         const val BT_DEVICE_ALREAD_CONN = 19
 
         //usb相关
         //该设备已经连接过
         const val USB_DEVICE_ALREAD_CONN = 21
+
         //用户拒绝授权USB权限
         const val REFUSE_USB_PERMISSION = 21
+
         //获取不到USB设备信息
         const val USB_DEVICE_INFO_NOT_FOUND = 22
+
         //连接失败
         const val USB_CONN_FAILED = 23
     }
