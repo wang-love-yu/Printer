@@ -1,6 +1,8 @@
 # Printer
 
 ## 使用方法
+    implementation 'com.github.wang-love-yu:Printer:01123e5547'
+
 #### 初始化
 1. 在Application 中初始化 PrintManagerUtils.getInstance().init(this)
 #### 获取设备与连接
