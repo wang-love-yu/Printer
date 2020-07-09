@@ -129,7 +129,7 @@ class PrintManagerUtils {
             var manager = it.getSystemService(Context.USB_SERVICE) as UsbManager
             //检查权限
             if (hasUsbPermission(manager, usbDevice)) {
-                createUsbConnect(manager, address, usbDevice)
+                createUsbConnect(manager, address, usbDevice,mUsbPrintConnCallBack)
                 Log.d(TAG, "usbConect: $usbDevice has permission")
             } else {
                 Log.d(TAG, "usbConect: $usbDevice has no permission")
@@ -140,7 +140,7 @@ class PrintManagerUtils {
                 UsbRqPermissionReceiverManager(it).apply {
                     mUsbPermissionRqCallBack = object : UsbPermissionRqCallBack {
                         override fun rqSuccess() {
-                            createUsbConnect(manager, address, usbDevice)
+                            createUsbConnect(manager, address, usbDevice,mUsbPrintConnCallBack)
                         }
 
                         override fun reqFailed(message: String?) {

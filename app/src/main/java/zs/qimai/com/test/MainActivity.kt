@@ -1,13 +1,18 @@
 package zs.qimai.com.test
 
 import android.content.Intent
+import android.hardware.usb.UsbDevice
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import zs.qimai.com.printer2.callback.PrintCallBack
 import zs.qimai.com.printer2.callback.PrintConnOrDisCallBack
+import zs.qimai.com.printer2.callback.UsbPrintConnCallBack
+import zs.qimai.com.printer2.callback.UsbSearchCallBack
 import zs.qimai.com.printer2.canvas.LabelTemplete
 import zs.qimai.com.printer2.canvas.TestPrintTemplate
 import zs.qimai.com.printer2.executer.PrintExecutor
@@ -15,6 +20,7 @@ import zs.qimai.com.printer2.manager.DeviceManager
 import zs.qimai.com.printer2.manager.DeviceManager.Companion.BT
 import zs.qimai.com.printer2.manager.DeviceManager.Companion.USB
 import zs.qimai.com.printer2.manager.DeviceManagerUtils
+import zs.qimai.com.printer2.manager.UsbDeviceManager
 import zs.qimai.com.printer2.utils.PrintManagerUtils
 
 class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
@@ -34,8 +40,10 @@ class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
     private val TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         DeviceManagerUtils.getInstance().addConnectStatusCallBack(this)
+        initUsbPrinter()
         tv_connect_bt.setOnClickListener {
             startActivity(Intent(this, BtListActivity::class.java))
         }
@@ -103,6 +111,44 @@ class MainActivity : AppCompatActivity(), PrintConnOrDisCallBack {
     }
 
 
+    private fun initUsbPrinter() {
+        val usbDevices = mutableMapOf<String, UsbDevice>()
+        PrintManagerUtils.getInstance()
+            .getSearchUsbList(object : UsbSearchCallBack {
+                override fun onSearchStart() {}
+                @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+                override fun onSearchFound(
+                    s: String,
+                    usbDevice: UsbDevice
+                ) {
+
+                    if (!usbDevice.manufacturerName?.trim().equals("POSIN")) {
+                        usbDevices[s] = usbDevice
+                    }
+                }
+
+                override fun onSearchError(i: Int, s: String?) {}
+                override fun onSearchFinish() {
+
+                    usbDevices.forEach { entry ->
+                        PrintManagerUtils.getInstance()
+                            .usbConnect(entry.key, entry.value, object : UsbPrintConnCallBack {
+                                override fun onConnStart() {}
+                                override fun onConnSucess(usbDeviceManager: UsbDeviceManager) {
+                                    Log.d("devicesBlue", "lianjie")
+                                    Log.d("devicesBlue", "${entry.value.toString()}")
+                                }
+
+                                override fun onConnFailed(i: Int, s: String) {
+                                    Log.d("devicesBlue", "fail")
+
+                                }
+                            })
+                    }
+
+                }
+            })
+    }
     private suspend fun two() {
         withContext(Dispatchers.IO) {
             Log.d(TAG, "two: ")
