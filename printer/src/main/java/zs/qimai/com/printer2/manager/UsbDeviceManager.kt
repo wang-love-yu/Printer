@@ -25,6 +25,8 @@ class UsbDeviceManager(override var mType: Int = USB) : DeviceManager() {
                 mmIntf = it.getInterface(0)
                 if (mmIntf != null) {
                     this.mmConnection = this.usbManager?.openDevice(this.usbDevice)
+                    this.deviceId = this.mmConnection?.serial?:""
+                    Log.v("devicesBlue","----${this.mmConnection!!.serial}")
                     if (this.mmConnection != null && this.mmConnection?.claimInterface(
                             mmIntf!!,
                             true

@@ -12,16 +12,20 @@ abstract class DeviceManager {
     var mInPutStream: InputStream? = null
     var mStatus = false
     var address: String? = null
+    var deviceId = ""
     var mPrintMode: Int? = null
     abstract var mType: Int
 
     companion object {
         //小票模式
         val ESC = 1
+
         //标签模式
         val TSC = 2
+
         //蓝牙
         val BT = 1
+
         //usb
         val USB = 2
     }
