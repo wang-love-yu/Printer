@@ -251,6 +251,6 @@ open class PrintWriter {
     /**
      * 获取每行最大字节数
      * **/
-    fun getPerLineMaxByteNums() = 32
+   open fun getPerLineMaxByteNums() = 32
 
 }
